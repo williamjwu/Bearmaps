@@ -1,0 +1,1 @@
+We need to use the slip hour because me and my partner stucked on GraphDB's closest function and adjacent function. We have to redesign the structure to achieve more efficient runtime.
