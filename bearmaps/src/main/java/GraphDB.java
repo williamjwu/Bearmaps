@@ -49,15 +49,15 @@ public class GraphDB {
      */
     private HashMap<Long, Node> nodes = new HashMap<>();
     private HashMap<Long, HashMap<Long, Edge>> nodeEdges = new HashMap<>();
-    private HashMap<Long, Nodeyyyy> nodeyyyys = new HashMap<>();
-    private HashMap<Double, Long> findnodeyyyysX = new HashMap<>();
-    private HashMap<Double, Long> findnodeyyyysY = new HashMap<>();
-    private Nodeyyyy root;
+    private HashMap<Long, KdNode> kdNodes = new HashMap<>();
+    private HashMap<Double, Long> kdNodesX = new HashMap<>();
+    private HashMap<Double, Long> kdNodesY = new HashMap<>();
+    private KdNode root;
     private double minX;
     private double minY;
     private double maxX;
     private double maxY;
-    private Nodeyyyy currentClosestNode;
+    private KdNode currentClosestNode;
 
     public GraphDB(String dbPath) {
         File inputFile = new File(dbPath);
@@ -86,7 +86,7 @@ public class GraphDB {
         return s.replaceAll("[^a-zA-Z ]", "").toLowerCase();
     }
 
-    static double euclideanNodeMod(double x, double y, Nodeyyyy node) {
+    static double euclideanNodeMod(double x, double y, KdNode node) {
         if (node == null) {
             return 999999999;
         }
@@ -242,7 +242,7 @@ public class GraphDB {
         return currentClosestNode.nodeId;
     }
 
-    public void closestHelper(Nodeyyyy currNode, double x, double y, Box currBox) {
+    public void closestHelper(KdNode currNode, double x, double y, Box currBox) {
         if (currNode == null) {
             return;
         }
@@ -356,7 +356,7 @@ public class GraphDB {
         nodeEdges.put(v2, nodes.get(v2).edgyHashMap);
     }
 
-    Nodeyyyy buildKdTree(Set<Long> list, int depth, Nodeyyyy curr) {
+    KdNode buildKdTree(Set<Long> list, int depth, KdNode curr) {
         int n = list.size();
         if (n <= 0) {
             return null;
@@ -365,29 +365,29 @@ public class GraphDB {
         double median = sortedList.get(sortedList.size() / 2);
 
         if (depth % 2 == 0) {
-            curr = new Nodeyyyy(findnodeyyyysX.get(median), 0);
+            curr = new KdNode(kdNodesX.get(median), 0);
             HashSet<Long> firstHalf = new HashSet<>();
             HashSet<Long> secondHalf = new HashSet<>();
             for (int i = 0; i < sortedList.size() / 2; i++) {
-                firstHalf.add(findnodeyyyysX.get(sortedList.get(i)));
+                firstHalf.add(kdNodesX.get(sortedList.get(i)));
             }
             curr.left = buildKdTree(firstHalf, depth + 1, curr.left);
             for (int i = sortedList.size() / 2 + 1; i < sortedList.size(); i++) {
-                secondHalf.add(findnodeyyyysX.get(sortedList.get(i)));
+                secondHalf.add(kdNodesX.get(sortedList.get(i)));
             }
             curr.right = buildKdTree(secondHalf, depth + 1, curr.right);
             return curr;
 
         } else {
-            curr = new Nodeyyyy(findnodeyyyysY.get(median), 1);
+            curr = new KdNode(kdNodesY.get(median), 1);
             HashSet<Long> firstHalf = new HashSet<>();
             HashSet<Long> secondHalf = new HashSet<>();
             for (int i = 0; i < sortedList.size() / 2; i++) {
-                firstHalf.add(findnodeyyyysY.get(sortedList.get(i)));
+                firstHalf.add(kdNodesY.get(sortedList.get(i)));
             }
             curr.left = buildKdTree(firstHalf, depth + 1, curr.left);
             for (int i = sortedList.size() / 2 + 1; i < sortedList.size(); i++) {
-                secondHalf.add(findnodeyyyysY.get(sortedList.get(i)));
+                secondHalf.add(kdNodesY.get(sortedList.get(i)));
             }
             curr.right = buildKdTree(secondHalf, depth + 1, curr.right);
             return curr;
@@ -399,7 +399,7 @@ public class GraphDB {
         ArrayList<Double> medianFinder = new ArrayList<>();
         if (i == 0) {
             for (long l : list) {
-                Nodeyyyy n = new Nodeyyyy(l, i);
+                KdNode n = new KdNode(l, i);
                 if (n.x < minX) {
                     minX = n.x;
                 }
@@ -407,13 +407,13 @@ public class GraphDB {
                     maxX = n.x;
                 }
                 medianFinder.add(n.x);
-                nodeyyyys.put(l, n);
-                findnodeyyyysX.put(n.x, l);
+                kdNodes.put(l, n);
+                kdNodesX.put(n.x, l);
             }
             medianFinder.sort((a, b) -> Double.compare(a, b));
         } else {
             for (long l : list) {
-                Nodeyyyy n = new Nodeyyyy(l, i);
+                KdNode n = new KdNode(l, i);
                 if (n.y < minY) {
                     minY = n.y;
                 }
@@ -421,8 +421,8 @@ public class GraphDB {
                     maxY = n.y;
                 }
                 medianFinder.add(n.y);
-                nodeyyyys.put(l, n);
-                findnodeyyyysY.put(n.y, l);
+                kdNodes.put(l, n);
+                kdNodesY.put(n.y, l);
             }
             medianFinder.sort((a, b) -> Double.compare(a, b));
         }
@@ -449,22 +449,22 @@ public class GraphDB {
 
     //second node class to handle kd tree
     //verticalOrHorizontal: when 0 is x, 1 is y
-    private class Nodeyyyy {
+    private class KdNode {
         long nodeId;
         double x;
         double y;
         int xOrY;
-        private Nodeyyyy left;
-        private Nodeyyyy right;
+        private KdNode left;
+        private KdNode right;
 
-        Nodeyyyy(long nodeId, int xOrY) {
+        KdNode(long nodeId, int xOrY) {
             this.nodeId = nodeId;
             this.xOrY = xOrY;
             x = projectToX(getNode(nodeId).lon, getNode(nodeId).lat);
             y = projectToY(getNode(nodeId).lon, getNode(nodeId).lat);
         }
 
-        Nodeyyyy() {
+        KdNode() {
         }
     }
 
