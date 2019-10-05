@@ -365,33 +365,26 @@ public class GraphDB {
         double median = sortedList.get(sortedList.size() / 2);
 
         if (depth % 2 == 0) {
-            curr = new KdNode(kdNodesX.get(median), 0);
-            HashSet<Long> firstHalf = new HashSet<>();
-            HashSet<Long> secondHalf = new HashSet<>();
-            for (int i = 0; i < sortedList.size() / 2; i++) {
-                firstHalf.add(kdNodesX.get(sortedList.get(i)));
-            }
-            curr.left = buildKdTree(firstHalf, depth + 1, curr.left);
-            for (int i = sortedList.size() / 2 + 1; i < sortedList.size(); i++) {
-                secondHalf.add(kdNodesX.get(sortedList.get(i)));
-            }
-            curr.right = buildKdTree(secondHalf, depth + 1, curr.right);
-            return curr;
-
+            curr = new KdNode(kdNodesX.get(median), depth % 2);
+            return buildKdNode(depth, curr, sortedList, kdNodesX);
         } else {
             curr = new KdNode(kdNodesY.get(median), 1);
-            HashSet<Long> firstHalf = new HashSet<>();
-            HashSet<Long> secondHalf = new HashSet<>();
-            for (int i = 0; i < sortedList.size() / 2; i++) {
-                firstHalf.add(kdNodesY.get(sortedList.get(i)));
-            }
-            curr.left = buildKdTree(firstHalf, depth + 1, curr.left);
-            for (int i = sortedList.size() / 2 + 1; i < sortedList.size(); i++) {
-                secondHalf.add(kdNodesY.get(sortedList.get(i)));
-            }
-            curr.right = buildKdTree(secondHalf, depth + 1, curr.right);
-            return curr;
+            return buildKdNode(depth, curr, sortedList, kdNodesY);
         }
+    }
+
+    private KdNode buildKdNode(int depth, KdNode curr, ArrayList<Double> sortedList, HashMap<Double, Long> kdNodesX) {
+        HashSet<Long> firstHalf = new HashSet<>();
+        HashSet<Long> secondHalf = new HashSet<>();
+        for (int i = 0; i < sortedList.size() / 2; i++) {
+            firstHalf.add(kdNodesX.get(sortedList.get(i)));
+        }
+        curr.left = buildKdTree(firstHalf, depth + 1, curr.left);
+        for (int i = sortedList.size() / 2 + 1; i < sortedList.size(); i++) {
+            secondHalf.add(kdNodesX.get(sortedList.get(i)));
+        }
+        curr.right = buildKdTree(secondHalf, depth + 1, curr.right);
+        return curr;
     }
 
 
