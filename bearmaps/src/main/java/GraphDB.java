@@ -69,10 +69,10 @@ public class GraphDB {
             e.printStackTrace();
         }
         clean();
-        minX = 999999999;
-        minY = 999999999;
-        maxX = -999999999;
-        minY = -999999999;
+        minX = Double.MAX_VALUE;
+        minY = Double.MAX_VALUE;
+        maxX = Double.MIN_VALUE;
+        minY = Double.MIN_VALUE;
         root = buildKdTree(nodes.keySet(), 0, root);
     }
 
@@ -88,7 +88,7 @@ public class GraphDB {
 
     static double euclideanNodeMod(double x, double y, KdNode node) {
         if (node == null) {
-            return 999999999;
+            return Double.MAX_VALUE;
         }
         return euclideanDistance(x, y, node.x, node.y);
     }
